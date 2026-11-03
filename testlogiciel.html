@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thunder Code - Agent de Test IA</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+        .card {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 480px;
+        }
+        h2 {
+            color: #1a365d;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e0;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        button {
+            width: 100%;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        button:hover {
+            background-color: #1d4ed8;
+        }
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            display: none;
+        }
+        .success {
+            background-color: #e6fffa;
+            border: 1px solid #38b2ac;
+            color: #234e52;
+        }
+        .warning {
+            background-color: #fffaf0;
+            border: 1px solid #dd6b20;
+            color: #7b341e;
+        }
+        .score {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h2>Thunder Code — Simulation de Test IA</h2>
+
+    <div class="form-group">
+        <label>Type de scénario à tester</label>
+        <select id="testType">
+            <option value="auth">Parcours Authentification & Connexion</option>
+            <option value="payment">Paiement en ligne & Panier</option>
+            <option value="api">Intégration API & Base de données</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>Nombre d'actions simulées</label>
+        <input type="number" id="actionsCount" value="150">
+    </div>
+
+    <div class="form-group">
+        <label>Temps d'exécution simulé (secondes)</label>
+        <input type="number" id="executionTime" value="12">
+    </div>
+
+    <button onclick="lancerTestIA()">Lancer le test IA</button>
+
+    <div id="resultBox" class="result-box">
+        <h3 style="margin: 0;">Analyse par Agent IA Terminée</h3>
+        <div id="bugScore" class="score">0 Bug</div>
+        <p id="riskLevel" style="font-weight: bold; margin: 5px 0;"></p>
+        <p id="detailsText" style="font-size: 13px; margin-top: 10px;"></p>
+    </div>
+</div>
+
+<script>
+function lancerTestIA() {
+    var type = document.getElementById('testType').value;
+    var actions = parseInt(document.getElementById('actionsCount').value);
+    var resultBox = document.getElementById('resultBox');
+    var bugScore = document.getElementById('bugScore');
+    var riskLevel = document.getElementById('riskLevel');
+    var detailsText = document.getElementById('detailsText');
+
+    resultBox.style.display = 'block';
+
+    if (type === 'payment' && actions > 100) {
+        resultBox.className = 'result-box warning';
+        bugScore.innerText = '2 Bugs détectés';
+        riskLevel.innerText = 'Niveau de Risque : MOYEN';
+        detailsText.innerText = '▪ L\'agent IA a détecté un temps de réponse élevé sur l\'étape de paiement et une erreur 404 sur le bouton d\'annulation.';
+    } else {
+        resultBox.className = 'result-box success';
+        bugScore.innerText = '0 Bug détecté';
+        riskLevel.innerText = 'Niveau de Risque : FAIBLE';
+        detailsText.innerText = '▪ Tous les scénarios simulés par l\'agent IA sont conformes. Script auto-correctif appliqué avec succès.';
+    }
+}
+</script>
+
+</body>
+</html>
