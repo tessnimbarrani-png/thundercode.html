@@ -4,12 +4,316 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thunder Code - Résultats des tests</title>
+
+    <title>ThunderCode - Résultats des Tests</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e3a8a;
+            font-size: 24px;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #4b5563;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        button:hover {
+            background-color: #1d4ed8;
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            border-radius: 6px;
+            display: none;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #d1fae5;
+            color: #065f46;
+            border: 1px solid #10b981;
+        }
+
+        .warning {
+            background-color: #fef3c7;
+            color: #92400e;
+            border: 1px solid #f59e0b;
+        }
+
+        .danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #ef4444;
+        }
+
+        .score {
+            font-size: 32px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .details {
+            text-align: left;
+            font-size: 14px;
+            margin-top: 10px;
+            list-style-type: square;
+            padding-left: 20px;
+        }
+
+        .summary {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .summary-item {
+            flex: 1;
+            padding: 15px 5px;
+            background: #f3f4f6;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .summary-item strong {
+            display: block;
+            font-size: 24px;
+            margin-bottom: 5px;
+        }
+    </style>
 </head>
+
 <body>
-    <h1>Résultats des tests</h1>
-    <p>Test 1 : Authentification - Réussi</p>
-    <p>Test 2 : Paiement - Échoué</p>
-    <p>Test 3 : Inscription - Réussi</p>
+
+<div class="container">
+
+    <h1>ThunderCode - Analyse des Résultats des Tests</h1>
+
+    <div class="form-group">
+        <label for="testName">Nom du test</label>
+        <input type="text" id="testName"
+               placeholder="Ex : Test de connexion">
+    </div>
+
+    <div class="form-group">
+        <label for="testType">Type de test</label>
+        <select id="testType">
+            <option value="Unitaire">Test unitaire</option>
+            <option value="Integration">Test d'intégration</option>
+            <option value="Fonctionnel">Test fonctionnel</option>
+            <option value="Performance">Test de performance</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="testStatus">Résultat du test</label>
+        <select id="testStatus">
+            <option value="success">Réussi (Passed)</option>
+            <option value="failure">Échoué (Failed)</option>
+            <option value="pending">En attente (Pending)</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="testDuration">Durée du test (secondes)</label>
+        <input type="number" id="testDuration"
+               placeholder="Ex : 2.5" min="0" step="0.1">
+    </div>
+
+    <button onclick="addTestResult()">
+        Ajouter le résultat
+    </button>
+
+    <div id="result" class="result-box">
+        <div id="resultTitle"
+             style="font-weight: bold; font-size: 18px;">
+            Analyse Terminée
+        </div>
+
+        <div class="score" id="successRate">0%</div>
+
+        <div id="resultLevel" style="font-weight: 600;"></div>
+
+        <div class="summary">
+            <div class="summary-item">
+                <strong id="totalTests">0</strong>
+                Total
+            </div>
+
+            <div class="summary-item">
+                <strong id="passedTests">0</strong>
+                Réussis
+            </div>
+
+            <div class="summary-item">
+                <strong id="failedTests">0</strong>
+                Échoués
+            </div>
+        </div>
+
+        <ul class="details" id="testDetails"></ul>
+    </div>
+
+</div>
+
+<script>
+
+    let tests = [];
+
+    function addTestResult() {
+
+        const name = document.getElementById('testName').value.trim();
+        const type = document.getElementById('testType').value;
+        const status = document.getElementById('testStatus').value;
+        const duration = parseFloat(
+            document.getElementById('testDuration').value
+        );
+
+        if (name === '' || document.getElementById('testDuration').value === ''
+            || !Number.isFinite(duration) || duration < 0) {
+            alert('Veuillez saisir un nom et une durée valide.');
+            return;
+        }
+
+        const test = {
+            name: name,
+            type: type,
+            status: status,
+            duration: duration
+        };
+
+        tests.push(test);
+
+        displayResults();
+
+        document.getElementById('testName').value = '';
+        document.getElementById('testDuration').value = '';
+    }
+
+    function displayResults() {
+
+        const total = tests.length;
+
+        const passed = tests.filter(
+            test => test.status === 'success'
+        ).length;
+
+        const failed = tests.filter(
+            test => test.status === 'failure'
+        ).length;
+
+        const pending = tests.filter(
+            test => test.status === 'pending'
+        ).length;
+
+        const successRate = total > 0
+            ? Math.round((passed / total) * 100)
+            : 0;
+
+        const resultDiv = document.getElementById('result');
+
+        resultDiv.style.display = 'block';
+
+        document.getElementById('successRate').innerText =
+            successRate + '%';
+
+        document.getElementById('totalTests').innerText = total;
+        document.getElementById('passedTests').innerText = passed;
+        document.getElementById('failedTests').innerText = failed;
+
+        const level = document.getElementById('resultLevel');
+
+        resultDiv.className = 'result-box';
+
+        if (failed > 0) {
+            resultDiv.classList.add('danger');
+            level.innerText = 'Des tests ont échoué.';
+        } else if (pending > 0) {
+            resultDiv.classList.add('warning');
+            level.innerText = 'Des tests sont encore en attente.';
+        } else {
+            resultDiv.classList.add('success');
+            level.innerText = 'Tous les tests sont réussis !';
+        }
+
+        const details = document.getElementById('testDetails');
+
+        details.innerHTML = '';
+
+        tests.forEach((test, index) => {
+
+            const li = document.createElement('li');
+
+            let statusText = '';
+
+            if (test.status === 'success') {
+                statusText = 'Réussi';
+            } else if (test.status === 'failure') {
+                statusText = 'Échoué';
+            } else {
+                statusText = 'En attente';
+            }
+
+            li.innerText =
+                `Test ${index + 1} : ${test.name} | ` +
+                `Type : ${test.type} | ` +
+                `Résultat : ${statusText} | ` +
+                `Durée : ${test.duration} secondes`;
+
+            details.appendChild(li);
+        });
+    }
+
+</script>
+
 </body>
 </html>
